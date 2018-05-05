@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 def start(bot, update):
     update.message.reply_text('Hello ovdingenbot!')
 
+def trein(bot, update, args):
+    update.message.reply_text(str(args))
+
 def main():
     """Start the bot."""
 
@@ -29,6 +32,7 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("trein", trein, pass_args=True))
 
     # Start the Bot
     updater.start_polling()

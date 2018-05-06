@@ -32,6 +32,7 @@ def main():
     dp.add_handler(CommandHandler("start", bot_handlers.start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("trein", bot_handlers.trein, pass_args=True))
+    dp.add_handler(CommandHandler("station", bot_handlers.station, pass_args=True))
 
     dp.add_handler(InlineQueryHandler(bot_handlers.inlinequery))
 

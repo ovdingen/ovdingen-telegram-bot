@@ -1,4 +1,4 @@
-from bot_text import treinToText
+from bot_text import treinToText, stationToText
 import datetime
 import dvs
 from uuid import uuid4
@@ -27,6 +27,24 @@ def trein(bot, update, args):
     train = dvs.train("https://dvs.ovdingen.nl", date, treinnummer)
 
     message = treinToText(train)
+    
+
+    update.message.reply_text(message, parse_mode="Markdown")
+
+def station(bot, update, args):
+    if len(args) > 1:
+        update.message.reply_text("Too many arguments. Try using /help.")
+        return False
+    if len(args) is 0:
+        update.message.reply_text("Too few arguments. Try using /help.")
+        return False
+    
+    stationcode = args[0]
+
+
+    station = dvs.station("https://dvs.ovdingen.nl", stationcode)
+
+    message = stationToText(station)
     
 
     update.message.reply_text(message, parse_mode="Markdown")

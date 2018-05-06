@@ -24,10 +24,18 @@ def treinToText(treininfo, instant = False):
         vleugel = treininfo['vleugels'][0]
         for stop in vleugel['stopstations']:
             if stop['aankomst'] == None and stop['vertrek']: # Beginstation
+                if stop['vertrekspoor'] is None:
+                    stop['vertrekspoor'] = '-'
                 stops += u"_{}_ ({}) V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
             elif stop['vertrek'] == None and stop['aankomst']: # Eindstation
+                if stop['aankomstspoor'] is None:
+                    stop['aankomstspoor'] = '-'
                 stops += u"_{}_ ({}) A {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), stop['aankomstspoor'])
             else: # Tussenstation
+                if stop['aankomstspoor'] is None:
+                    stop['aankomstspoor'] = '-'
+                if stop['vertrekspoor'] is None:
+                    stop['vertrekspoor'] = '-' 
                 stops += u"_{}_ ({}) A {} V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
         stops += "\n"
         

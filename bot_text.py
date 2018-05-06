@@ -12,9 +12,9 @@ def treinToText(treininfo, instant = False):
         else:
             return "Niet gevonden"
     if treininfo['via']:
-        header = "*{} {} {} richting {} via {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'], treininfo['via'])
+        header = u"*{} {} {} richting {} via {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'], treininfo['via'])
     else:
-        header = "*{} {} {} richting {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'])
+        header = u"*{} {} {} richting {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'])
 
 
     if len(treininfo['vleugels']) > 1:
@@ -24,11 +24,11 @@ def treinToText(treininfo, instant = False):
         vleugel = treininfo['vleugels'][0]
         for stop in vleugel['stopstations']:
             if stop['aankomst'] == None and stop['vertrek']: # Beginstation
-                stops += "_{}_ ({}) V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
+                stops += u"_{}_ ({}) V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
             elif stop['vertrek'] == None and stop['aankomst']: # Eindstation
-                stops += "_{}_ ({}) A {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), stop['aankomstspoor'])
+                stops += u"_{}_ ({}) A {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), stop['aankomstspoor'])
             else: # Tussenstation
-                stops += "_{}_ ({}) A {} V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
+                stops += u"_{}_ ({}) A {} V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
         stops += "\n"
         
         mat_text = "*Materieel:*\n"
@@ -37,9 +37,9 @@ def treinToText(treininfo, instant = False):
         else:
             for materieel in vleugel['mat']:
                 if materieel[2] is None: # geen mat-nr
-                    mat_text += "{}, eindbestemming {}\n".format(materieel[0], materieel[1])
+                    mat_text += u"{}, eindbestemming {}\n".format(materieel[0], materieel[1])
                 else:
-                    mat_text += "{} {}, eindbestemming {}\n".format(materieel[0], materieel[2], materieel[1])
+                    mat_text += u"{} {}, eindbestemming {}\n".format(materieel[0], materieel[2], materieel[1])
 
         vleugeltekst = stops + mat_text
             
@@ -89,18 +89,18 @@ def stationToText(station, instant = False, limit = 20):
         station = station[:-ar]
 
     for vertrek in station:
-        message += "*{}* spoor {} {} {} {} naar {}".format(iso8601toHHMM(vertrek['vertrek']), vertrek['spoor'], vertrek['vervoerder'], vertrek['soortAfk'], vertrek['treinNr'], vertrek['bestemming'])
+        message += u"*{}* spoor {} {} {} {} naar {}".format(iso8601toHHMM(vertrek['vertrek']), vertrek['spoor'], vertrek['vervoerder'], vertrek['soortAfk'], vertrek['treinNr'], vertrek['bestemming'])
         if vertrek['via'] is not None:
-            message += " via {}".format(vertrek['via'])
+            message += u" via {}".format(vertrek['via'])
         if vertrek['vertraging']:
-            message += " *+{}*".format(vertrek['vertraging'])
+            message += u" *+{}*".format(vertrek['vertraging'])
         message += "\n"
         if len(vertrek['tips']) is not 0:
             for tip in vertrek['tips']:
-                message += "_" + tip + "_\n"
+                message += u"_" + tip + "_\n"
         if len(vertrek['opmerkingen']) is not 0:
             for opmerking in vertrek['opmerkingen']:
-                message += "*" + opmerking + "*\n"
+                message += u"*" + opmerking + "*\n"
         if vertrek['opgeheven'] is True:
             message += "*Rijdt niet*\n"
 

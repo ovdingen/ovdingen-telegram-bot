@@ -12,6 +12,65 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+def treinToText(treininfo):
+    if treininfo['via']:
+        header = "*{} {} {} richting {} via {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'], treininfo['via'])
+    else:
+        header = "*{} {} {} richting {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'])
+
+
+    if len(treininfo['vleugels']) > 1:
+        vleugeltekst = "trein bevat > 1 vleugel, not yet implemented"
+    else:
+        stops = "*Stops:*\n"
+        vleugel = treininfo['vleugels'][0]
+        for stop in vleugel['stopstations']:
+            if stop['aankomst'] == None and stop['vertrek']: # Beginstation
+                stops += "_{}_ ({}) V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), stop['vertrek'], stop['vertrekspoor'])
+            elif stop['vertrek'] == None and stop['aankomst']: # Eindstation
+                stops += "_{}_ ({}) A {} spoor {}\n".format(stop['naam'], stop['code'].upper(), stop['aankomst'], stop['aankomstspoor'])
+            else: # Tussenstation
+                stops += "_{}_ ({}) A {} V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), stop['aankomst'], stop['vertrek'], stop['vertrekspoor'])
+        stops += "\n"
+        
+        mat_text = "*Materieel:*\n"
+        if len(vleugel['mat']) is 0:
+            mat_text += "Materieelinfo niet beschikbaar"
+        else:
+            for materieel in vleugel['mat']:
+                if materieel[2] is None: # geen mat-nr
+                    mat_text += "{}, eindbestemming {}\n".format(materieel[0], materieel[1])
+                else:
+                    mat_text += "{} {}, eindbestemming {}\n".format(materieel[0], materieel[2], materieel[1])
+
+        vleugeltekst = stops + mat_text
+            
+    notices = ""
+    if len(treininfo['tips']) > 0:
+        reistips = "*Reistip(s):*\n"
+        for tip in treininfo['tips']:
+            reistips += tip + "\n"
+    else:
+        reistips = ""
+    if len(treininfo['opmerkingen']) > 0:
+        opmerkingen = "*Opmerking(en):*\n"
+        for opmerking in treininfo['opmerkingen']:
+            opmerkingen += opmerking + "\n"
+    else:
+        opmerkingen = ""
+
+    if treininfo['opgeheven'] is True:
+        opgeheven = "\n\n*Deze trein is opgeheven!*"
+    else:
+        opgeheven = ""
+    
+    notices = reistips + opmerkingen + opgeheven
+    
+
+    
+    return header + vleugeltekst + notices
+ 
+
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -35,44 +94,10 @@ def trein(bot, update, args):
     else:
         date = args[1]
 
-    treininfo = dvs.train("https://dvs.ovdingen.nl", date, treinnummer)
+    train = dvs.train("https://dvs.ovdingen.nl", date, treinnummer)
+
+    message = treinToText(train)
     
-    if treininfo['via']:
-        header = "*{} {} {} richting {} via {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'], treininfo['via'])
-    else:
-        header = "*{} {} {} richting {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'])
-
-
-    if len(treininfo['vleugels']) > 1:
-        vleugeltekst = "trein bevat > 1 vleugel, not yet implemented"
-    else:
-        stops = "*Stops:*\n"
-        vleugel = treininfo['vleugels'][0]
-        for stop in vleugel['stopstations']:
-            if stop['aankomst'] == None and stop['vertrek']: # Beginstation
-                stops += "_{}_ ({}) V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), stop['vertrek'], stop['vertrekspoor'])
-            elif stop['vertrek'] == None and stop['aankomst']: # Eindstation
-                stops += "_{}_ ({}) A {} spoor {}\n".format(stop['naam'], stop['code'].upper(), stop['aankomst'], stop['aankomstspoor'])
-            else: # Tussenstation
-                stops += "_{}_ ({}) A {} V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), stop['aankomst'], stop['vertrek'], stop['vertrekspoor'])
-        
-        mat_text = "*Materieel:*\n"
-        if len(vleugel['mat']) is 0:
-            mat_text += "Materieelinfo niet beschikbaar"
-        else:
-            for materieel in vleugel['mat']:
-                if materieel[2] is None: # geen mat-nr
-                    mat_text += "{}, eindbestemming {}".format(materieel[0], materieel[1])
-                else:
-                    mat_text += "{} {}, eindbestemming {}".format(materieel[0], materieel[2], materieel[1])
-        
-
-
-        vleugeltekst = stops + "\n" + mat_text
-            
-
-    
-    message = header + vleugeltekst
 
     update.message.reply_text(message, parse_mode="Markdown")
 

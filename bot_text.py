@@ -68,8 +68,10 @@ def treinToText(treininfo, instant = False):
     
     return header + vleugeltekst + notices
 
-def stationToText(station, instant = False):
+def stationToText(station, instant = False, limit = 20):
     message = ""
+
+
     if station is False:
         if instant is True:
             return False
@@ -80,6 +82,12 @@ def stationToText(station, instant = False):
             return False
         else:
             return "Niet gevonden."
+
+    amount_of_departures = len(station)
+    if amount_of_departures > limit:
+        ar = amount_of_departures - limit
+        station = station[:-ar]
+
     for vertrek in station:
         message += "*{}* spoor {} {} {} {} naar {}".format(iso8601toHHMM(vertrek['vertrek']), vertrek['spoor'], vertrek['vervoerder'], vertrek['soortAfk'], vertrek['treinNr'], vertrek['bestemming'])
         if vertrek['via'] is not None:
@@ -96,7 +104,6 @@ def stationToText(station, instant = False):
         if vertrek['opgeheven'] is True:
             message += "*Rijdt niet*\n"
 
-        message += "\n"      
+        message += "\n"
 
-    
     return message

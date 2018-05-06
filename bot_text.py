@@ -5,7 +5,12 @@ def iso8601toHHMM(input):
     return datetime.strftime("%H:%M")
 
 
-def treinToText(treininfo):
+def treinToText(treininfo, instant = False):
+    if treininfo is False:
+        if instant is True:
+            return treininfo
+        else:
+            return "Niet gevonden"
     if treininfo['via']:
         header = "*{} {} {} richting {} via {}*\n".format(treininfo['vervoerder'], treininfo['soort'], treininfo['treinNr'], treininfo['bestemming'], treininfo['via'])
     else:
@@ -63,10 +68,13 @@ def treinToText(treininfo):
     
     return header + vleugeltekst + notices
 
-def stationToText(station):
+def stationToText(station, instant = False):
     message = ""
     if len(station) is 0:
-        return False
+        if instant is True:
+            return False
+        else:
+            return "Niet gevonden."
     for vertrek in station:
         message += "*{}* spoor {} {} {} {} naar {}".format(iso8601toHHMM(vertrek['vertrek']), vertrek['spoor'], vertrek['vervoerder'], vertrek['soortAfk'], vertrek['treinNr'], vertrek['bestemming'])
         if vertrek['via'] is not None:

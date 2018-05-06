@@ -3,6 +3,19 @@ import datetime
 import dvs
 from uuid import uuid4
 from telegram import InlineQueryResultArticle, InputTextMessageContent
+from sets import Set
+
+
+def isStationCode(input):
+    if len(input) > 6:
+        return False
+
+    allowed_chars = Set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    if Set(input).issubset(allowed_chars) is False:
+        return False
+    
+    return True
+
 
 def start(bot, update):
     update.message.reply_text('Hello ovdingenbot! /help')
@@ -59,10 +72,25 @@ def inlinequery(bot, update):
         if len(query) < 7: # Treinnummers zijn nooit langer dan 7 cijfers.
             date = datetime.datetime.today().strftime('%Y-%m-%d')
             trein = dvs.train("https://dvs.ovdingen.nl", date, query)
-            trein_result = InlineQueryResultArticle(
+            treinText = treinToText(trein, instant=True)
+            if treinText:
+                trein_result = InlineQueryResultArticle(
+                    id=uuid4(),
+                    title = "Trein {}".format(query),
+                    input_message_content=InputTextMessageContent(treinText, parse_mode="Markdown")
+                )
+                results.append(trein_result)
+    
+    if isStationCode(query): # Query is geldige stationscode
+        station = dvs.station("https://dvs.ovdingen.nl", query)
+        stationText = stationToText(station, instant=True)
+        if stationText:
+            station_result = InlineQueryResultArticle(
                 id=uuid4(),
-                title = "Trein {}".format(query),
-                input_message_content=InputTextMessageContent(treinToText(trein), parse_mode="Markdown")
+                title = "Station {}".format(query),
+                input_message_content=InputTextMessageContent(stationText, parse_mode="Markdown")
             )
-            results.append(trein_result)
+            results.append(station_result)
+    
+
     update.inline_query.answer(results)

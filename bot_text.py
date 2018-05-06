@@ -93,7 +93,7 @@ def stationToText(station, instant = False, limit = 20):
         if vertrek['via'] is not None:
             message += u" via {}".format(vertrek['via'])
         if vertrek['vertraging']:
-            message += u" *+{}*".format(vertrek['vertraging'])
+            message += u" *+{} min.*".format(vertrek['vertraging'])
         message += "\n"
         if len(vertrek['tips']) is not 0:
             for tip in vertrek['tips']:

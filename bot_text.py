@@ -70,6 +70,11 @@ def treinToText(treininfo, instant = False):
 
 def stationToText(station, instant = False):
     message = ""
+    if station is False:
+        if instant is True:
+            return False
+        else:
+            return "Niet gevonden."
     if len(station) is 0:
         if instant is True:
             return False

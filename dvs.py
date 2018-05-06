@@ -41,7 +41,10 @@ def train(addr, day, service_number):
     service_number_esc = urllib.quote(service_number, safe='')
 
     r = requests.get(addr + "/v2/trein/" + service_number_esc + "/" + day_esc, headers=headers)
-    response = json.loads(r.text)
+    try:
+        response = json.loads(r.text)
+    except ValueError:
+        return False
     
     if response['result'] != "OK":
         return False

@@ -7,7 +7,6 @@ import logging
 import json
 import datetime
 import dvs
-import bot_text
 import bot_handlers
 from uuid import uuid4
 

@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
+from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent
+from telegram.utils.helpers import escape_markdown
 import logging
 import json
 import datetime
 import dvs
+from uuid import uuid4
+
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -101,6 +105,24 @@ def trein(bot, update, args):
 
     update.message.reply_text(message, parse_mode="Markdown")
 
+def inlinequery(bot, update):
+    """Handle the inline query."""
+    query = update.inline_query.query
+
+    results = []
+
+    if query.isdigit(): # Query is een getal
+        if len(query) < 7: # Treinnummers zijn nooit langer dan 7 cijfers.
+            date = datetime.datetime.today().strftime('%Y-%m-%d')
+            trein = dvs.train("https://dvs.ovdingen.nl", date, query)
+            trein_result = InlineQueryResultArticle(
+                id=uuid4(),
+                title = "Trein {}".format(query),
+                input_message_content=InputTextMessageContent(treinToText(trein), parse_mode="Markdown")
+            )
+            results.append(trein_result)
+    update.inline_query.answer(results)
+
 def main():
     """Start the bot."""
 
@@ -116,6 +138,8 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("trein", trein, pass_args=True))
+
+    dp.add_handler(InlineQueryHandler(inlinequery))
 
     # Start the Bot
     updater.start_polling()

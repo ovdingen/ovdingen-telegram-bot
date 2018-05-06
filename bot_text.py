@@ -84,8 +84,19 @@ def stationToText(station, instant = False):
         message += "*{}* spoor {} {} {} {} naar {}".format(iso8601toHHMM(vertrek['vertrek']), vertrek['spoor'], vertrek['vervoerder'], vertrek['soortAfk'], vertrek['treinNr'], vertrek['bestemming'])
         if vertrek['via'] is not None:
             message += " via {}".format(vertrek['via'])
-
+        if vertrek['vertraging']:
+            message += " *+{}*".format(vertrek['vertraging'])
         message += "\n"
+        if len(vertrek['tips']) is not 0:
+            for tip in vertrek['tips']:
+                message += "_" + tip + "_\n"
+        if len(vertrek['opmerkingen']) is not 0:
+            for opmerking in vertrek['opmerkingen']:
+                message += "*" + opmerking + "*\n"
+        if vertrek['opgeheven'] is True:
+            message += "*Rijdt niet*\n"
+
+        message += "\n"      
 
     
     return message

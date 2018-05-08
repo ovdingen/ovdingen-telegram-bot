@@ -26,17 +26,34 @@ def treinToText(treininfo, instant = False):
             if stop['aankomst'] == None and stop['vertrek']: # Beginstation
                 if stop['vertrekspoor'] is None:
                     stop['vertrekspoor'] = '-'
-                stops += u"_{}_ ({}) V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
+                if stop['vertragingVertrek'] > 0:
+                    vertragingVertrek = " *+{} min*".format(stop['vertragingVertrek'])
+                else:
+                    vertragingVertrek = ""
+                stops += u"_{}_ ({}) V {}{} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['vertrek']), vertragingVertrek, stop['vertrekspoor'])
             elif stop['vertrek'] == None and stop['aankomst']: # Eindstation
+                if stop['vertragingAankomst'] > 0:
+                    vertragingAankomst = " *+{} min*".format(stop['vertragingAankomst'])
+                else:
+                    vertragingAankomst = ""
                 if stop['aankomstspoor'] is None:
                     stop['aankomstspoor'] = '-'
-                stops += u"_{}_ ({}) A {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), stop['aankomstspoor'])
+                stops += u"_{}_ ({}) A {}{} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), vertragingAankomst, stop['aankomstspoor'])
             else: # Tussenstation
+                if stop['vertragingAankomst'] > 0:
+                    vertragingAankomst = " *+{} min*".format(stop['vertragingAankomst'])
+                else:
+                    vertragingAankomst = ""
+                if stop['vertragingVertrek'] > 0:
+                    vertragingVertrek = " *+{} min*".format(stop['vertragingVertrek'])
+                else:
+                    vertragingVertrek = ""
+                
                 if stop['aankomstspoor'] is None:
                     stop['aankomstspoor'] = '-'
                 if stop['vertrekspoor'] is None:
                     stop['vertrekspoor'] = '-' 
-                stops += u"_{}_ ({}) A {} V {} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), iso8601toHHMM(stop['vertrek']), stop['vertrekspoor'])
+                stops += u"_{}_ ({}) A {}{} V {}{} spoor {}\n".format(stop['naam'], stop['code'].upper(), iso8601toHHMM(stop['aankomst']), vertragingAankomst, iso8601toHHMM(stop['vertrek']), vertragingVertrek, stop['vertrekspoor'])
         stops += "\n"
         
         mat_text = "*Materieel:*\n"

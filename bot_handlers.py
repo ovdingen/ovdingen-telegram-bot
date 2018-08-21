@@ -80,6 +80,25 @@ def inlinequery(bot, update):
                     input_message_content=InputTextMessageContent(treinText, parse_mode="Markdown")
                 )
                 results.append(trein_result)
+    # probeer TREINNR:STATIONCODE te parsen
+    query_split = query.split(":")
+    if len(query_split) is 2:
+        if query_split[0].isdigit(): # controleer of het een getal is
+            if len(query_split[0]) < 7: # treinnrs zijn nooit langer dan 7 cijfers
+                if query_split[1].isalpha(): # stationscodes moeten alphanumeriek zijn
+                    if len(query_split[1]) < 5: # stationscodes in NL zijn nooit langer dan 4 tekens
+                        date = datetime.datetime.today().strftime('%Y-%m-%d')
+                        trein = dvs.train("https://dvs.ovdingen.nl", date, query_split[0], query_split[1])
+                        treinText = treinToText(trein, instant=True)
+                        if treinText:
+                            trein_result = InlineQueryResultArticle(
+                                id = uuid4(),
+                                title = "Trein {} op station {}".format(query_split[0], query_split[1]),
+                                input_message_content=InputTextMessageContent(treinText, parse_mode="Markdown")
+                            )
+                            results.append(trein_result)
+
+
     
     if isStationCode(query): # Query is geldige stationscode
         station = dvs.station("https://dvs.ovdingen.nl", query)

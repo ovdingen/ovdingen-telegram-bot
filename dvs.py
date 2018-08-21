@@ -29,7 +29,7 @@ def station(addr, station_code):
     
     return response['vertrektijden']
     
-def train(addr, day, service_number):
+def train(addr, day, service_number, station = False):
     headers = {
         "User-Agent": "Trein.app website backend/1.0"
     }
@@ -39,8 +39,11 @@ def train(addr, day, service_number):
 
     day_esc = urllib.quote(day, safe='')
     service_number_esc = urllib.quote(service_number, safe='')
-
-    r = requests.get(addr + "/v2/trein/" + service_number_esc + "/" + day_esc, headers=headers)
+    if station is False:
+        requestaddr = addr + "/v2/trein/" + service_number_esc + "/" + day_esc
+    else:
+        requestaddr = addr + "/v2/trein/" + service_number_esc + "/" + day_esc + "/" + station 
+    r = requests.get(requestaddr, headers=headers)
     try:
         response = json.loads(r.text)
     except ValueError:

@@ -89,7 +89,7 @@ def inlinequery(bot, update):
                     if len(query_split[1]) < 5: # stationscodes in NL zijn nooit langer dan 4 tekens
                         date = datetime.datetime.today().strftime('%Y-%m-%d')
                         trein = dvs.train("https://dvs.ovdingen.nl", date, query_split[0], query_split[1])
-                        treinText = treinToText(trein, instant=True)
+                        treinText = treinToText(trein, instant=True, currentstation=query_split[1])
                         if treinText:
                             trein_result = InlineQueryResultArticle(
                                 id = uuid4(),

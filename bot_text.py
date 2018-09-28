@@ -1,11 +1,12 @@
 import dateutil.parser
+import station
 
 def iso8601toHHMM(input):
     datetime = dateutil.parser.parse(input)
     return datetime.strftime("%H:%M")
 
 
-def treinToText(treininfo, instant = False):
+def treinToText(treininfo, instant = False, currentstation = False):
     if treininfo is False:
         if instant is True:
             return treininfo
@@ -22,6 +23,13 @@ def treinToText(treininfo, instant = False):
     else:
         stops = "*Stops:*\n"
         vleugel = treininfo['vleugels'][0]
+        if currentstation:
+            if treininfo['vertraging'] > 0:
+                currentvertraging = "*+{} min*".format(treininfo['vertraging'])
+            else:
+                currentvertraging = ""
+            curstation = station.get_station(currentstation, "https://stations.ovdingen.nl")
+            stops += u"_{}_ ({}) V {}{} spoor {}\n".format(curstation['name_long'], currentstation.upper(), iso8601toHHMM(treininfo['vertrek']), currentvertraging, treininfo['spoor'])
         for stop in vleugel['stopstations']:
             if stop['aankomst'] == None and stop['vertrek']: # Beginstation
                 if stop['vertrekspoor'] is None:
